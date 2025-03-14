@@ -1,0 +1,41 @@
+% tf tempo final da simulação [s]
+6.0
+
+% Passo de integração dt [s]
+1e-5
+
+% S – área da asa [m2]
+2.0e-2
+
+% b comprimento da asa [m]
+14e-2
+
+% m – massa da aeronave [kg]
+5e-3
+
+% Aceleração da gravidade [m/s2]
+9.801
+
+% rho – densidade de ar ao nível do mar [kg/m3]
+1.225
+
+% CD0 – valor do coeficiente de drag para Cl = 0
+0.02
+
+% e – factor de eficiência de Oswald
+0.9
+
+% alpha – ângulo de ataque [rad] (cuidado com o valor desta variável !!!)
+0.1
+
+% V(0) -velocidade inicial [m/s]
+11.0
+
+% gamma(0) [rad] – flight path angle inicial
+0.0
+
+% x(0) posição horizontal inicial [m]
+0.0
+
+% h(0) – altitude inicial [m]
+5.0
