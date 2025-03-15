@@ -28,49 +28,35 @@ double calcular_Drag(double CD, double rho, double V, double S) {
 /***************INICIO: conteudo original de ler_ficheiro.c (Duarte)/(Manuel)***************/
 
 /* Funcao para ler as variaveis*/
-int ler_variaveis(double *tf, double *dt,
-    double *S, double *b, double *m,
-    double *g, double *ro, double *cd0,
-    double *e, double *alpha, double *v0,
-    double *gamma0, double *x0, double *h0)
-{
-    char linha[100];  
-    int parametros_lidos = 0;
+int ler_variaveis(double *tf, double *dt, double *S, double *b, double *m,
+                  double *g, double *ro, double *cd0, double *e, double *alpha,
+                  double *v0, double *gamma0, double *x0, double *h0) {
     FILE *arquivo = fopen("config_modelo.txt", "r");
-    if (arquivo == NULL) {
+    if (!arquivo) {
         printf("Erro: Arquivo nao encontrado!\n");
         return 0;
     }
-    while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-        {
-            int so_espacos = 1;
-            int i;
-            for (i = 0; linha[i] != '\0'; i++) {
-                if (linha[i] != ' ' && linha[i] != '\t' &&
-                    linha[i] != '\n' && linha[i] != '\r') {
-                    so_espacos = 0;
-                    break;
-                }
-            }
-            if (so_espacos) {
-                /* Se for so espacos, ignora esta linha e vai pra proxima */
-                continue;
-            }
-        }
-        if (linha[0] == '%' || linha[0] == '\n') {
-            continue; /* Ignorar comentarios e linhas vazias para complementar (failsafe) */
-        }
+
+    char linha[100];
+    int parametros_lidos = 0;
+
+    while (fgets(linha, sizeof(linha), arquivo)) {
+        // Ignorar linhas vazias ou que comecem com '%'
+        char *p = linha;
+        while (*p == ' ' || *p == '\t') p++; // Pular espaços iniciais
+        if (*p == '%' || *p == '\n' || *p == '\r' || *p == '\0') continue;
+
         switch (parametros_lidos) {
-            case 0: sscanf(linha, "%lf", tf); break;
-            case 1: sscanf(linha, "%lf", dt); break;
-            case 2: sscanf(linha, "%lf", S); break;
-            case 3: sscanf(linha, "%lf", b); break;
-            case 4: sscanf(linha, "%lf", m); break;
-            case 5: sscanf(linha, "%lf", g); break;
-            case 6: sscanf(linha, "%lf", ro); break;
-            case 7: sscanf(linha, "%lf", cd0); break;
-            case 8: sscanf(linha, "%lf", e); break;
-            case 9: sscanf(linha, "%lf", alpha); break;
+            case 0:  sscanf(linha, "%lf", tf); break;
+            case 1:  sscanf(linha, "%lf", dt); break;
+            case 2:  sscanf(linha, "%lf", S); break;
+            case 3:  sscanf(linha, "%lf", b); break;
+            case 4:  sscanf(linha, "%lf", m); break;
+            case 5:  sscanf(linha, "%lf", g); break;
+            case 6:  sscanf(linha, "%lf", ro); break;
+            case 7:  sscanf(linha, "%lf", cd0); break;
+            case 8:  sscanf(linha, "%lf", e); break;
+            case 9:  sscanf(linha, "%lf", alpha); break;
             case 10: sscanf(linha, "%lf", v0); break;
             case 11: sscanf(linha, "%lf", gamma0); break;
             case 12: sscanf(linha, "%lf", x0); break;
@@ -79,12 +65,9 @@ int ler_variaveis(double *tf, double *dt,
         }
         parametros_lidos++;
     }
+
     fclose(arquivo);
-    if (parametros_lidos == 14) {
-        return 1; /* Todos os parametros foram lidos corretamente */
-    } else {
-        return 0; /* Faltaram parametros */
-    }
+    return (parametros_lidos == 14);
 }
 /***************FIM: conteudo original de ler_ficheiro.c ******************/
 
