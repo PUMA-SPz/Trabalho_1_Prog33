@@ -88,7 +88,7 @@ int ler_variaveis(double *tf, double *dt,
 }
 /***************FIM: conteudo original de ler_ficheiro.c ******************/
 
-/***************INICIO: conteudo original de menu_selecao.c/***************/
+/***************INICIO: conteudo original de menu_selecao.c****************/
 
 void simular_movimento();
 void calcular_min_max();
