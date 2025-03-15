@@ -1,4 +1,5 @@
 /***************INICIO: conteudo original de calculos.c (Duarte)***************/
+
 #include <stdio.h>
 #include <math.h>
 #define M_PI 3.14159265358979323846
@@ -22,13 +23,9 @@ double calcular_Lift(double CL, double rho, double V, double S) {
 double calcular_Drag(double CD, double rho, double V, double S) {
     return CD * 0.5 * rho * V * V * S;
 }
-
-/*Falta definir AR = (b*b)/S ja defini na linha 212*/
 /***************FIM: conteudo original de calculos.c ***************/
 
-
 /***************INICIO: conteudo original de ler_ficheiro.c (Duarte)/(Manuel)***************/
-#include <stdio.h>
 
 /* Funcao para ler as variaveis*/
 int ler_variaveis(double *tf, double *dt,
@@ -40,21 +37,11 @@ int ler_variaveis(double *tf, double *dt,
     char linha[100];  
     int parametros_lidos = 0;
     FILE *arquivo = fopen("config_modelo.txt", "r");
-   
     if (arquivo == NULL) {
         printf("Erro: Arquivo nao encontrado!\n");
         return 0;
     }
-   
     while (fgets(linha, sizeof(linha), arquivo) != NULL) {
-
-        /********************************************************
-         * Codigo adicionado (sem remover nada do original)/Manuel:
-         estava a haver um erro em relacao a leitura dos espacos brancos
-         * Ignorar linhas que tenham apenas espacos/tabs.
-         Desculpa la ter mexido sem dizer nada mas eram 03:42 :-)
-         o \r e o carriage return btw
-         ********************************************************/
         {
             int so_espacos = 1;
             int i;
@@ -70,12 +57,9 @@ int ler_variaveis(double *tf, double *dt,
                 continue;
             }
         }
-        /*************** Fim do bocado adicionado ****************/
-
         if (linha[0] == '%' || linha[0] == '\n') {
-            continue; /* Ignorar comentarios e linhas vazias */
+            continue; /* Ignorar comentarios e linhas vazias para complementar (failsafe) */
         }
-        /*Acho que o Bertinho tinha limitado o numero de linhas n tenho a certeza*/
         switch (parametros_lidos) {
             case 0: sscanf(linha, "%lf", tf); break;
             case 1: sscanf(linha, "%lf", dt); break;
@@ -93,23 +77,18 @@ int ler_variaveis(double *tf, double *dt,
             case 13: sscanf(linha, "%lf", h0); break;
             default: break;
         }
-       
         parametros_lidos++;
     }
-   
     fclose(arquivo);
-   
     if (parametros_lidos == 14) {
         return 1; /* Todos os parametros foram lidos corretamente */
     } else {
         return 0; /* Faltaram parametros */
     }
 }
-/***************FIM: conteudo original de ler_ficheiro.c ***************/
+/***************FIM: conteudo original de ler_ficheiro.c ******************/
 
-
-/***************INICIO: conteudo original de menu_selecao.c/ aconselho a tirar todos os acentos ou caracteres especiais  ***************/
-#include <stdio.h>
+/***************INICIO: conteudo original de menu_selecao.c/***************/
 
 void simular_movimento();
 void calcular_min_max();
@@ -149,33 +128,8 @@ void menu_de_selecao() {
 }
 /***************FIM: conteudo original de menu_selecao.c ***************/
 
+/***************INICIO: simulacao das demais componentes****************/
 
-/* --------------------------------------------------------------------
-   A partir deste ponto:
-   - Implementacoes de simular_movimento() e calcular_min_max()
-   - Funcao main()
-   -Herobrine
-   -Pfv verifica se n me enganei em algo 
-   -Adicionar comandos para grafs no octave (15/03/2025)
-   ---------------------------------------------------------------------*/
-
-#include <math.h> /* repetido, sem problema */
-
-/* Precisamos das funcoes declaradas nos ficheiros originais: */
-int ler_variaveis(double *tf, double *dt,
-    double *S, double *b, double *m,
-    double *g, double *ro, double *cd0,
-    double *e, double *alpha, double *v0,
-    double *gamma0, double *x0, double *h0);
-
-double calcular_CL(double alpha, double AR);
-double calcular_CD(double CL, double CD0, double e, double AR);
-double calcular_Lift(double CL, double rho, double V, double S);
-double calcular_Drag(double CD, double rho, double V, double S);
-
-/* --------------------------------------------------------------------
-   Calculos + link com leitura de ficheiros
-   ---------------------------------------------------------------------*/
 void simular_movimento() {
     double tf, dt, S, b, m, g, rho, cd0, e, alpha;
     double V, gamma, x, h;
@@ -185,64 +139,49 @@ void simular_movimento() {
     double t;
     double lift, drag;
     double dV, dGamma, dx, dh;
-
     ok = ler_variaveis(&tf, &dt, &S, &b, &m, &g, &rho, &cd0, &e, &alpha, &V, &gamma, &x, &h);
     if (!ok) {
         /* Se return 0, a leitura de config_modelo.txt falhou */
         return;
     }
-
-    /* visualizacao no ecran: */
     printf("\n[Simular] Parametros lidos:\n");
     printf(" tf=%f\n dt=%e\n S=%g\n b=%g\n m=%g\n g=%g\n rho=%g\n cd0=%g\n e=%g\n alpha=%g\n",
-           tf, dt, S, b, m, g, rho, cd0, e, alpha);
+           tf, dt, S, b, m, g, rho, cd0, e, alpha); /* visualizacao no ecran: */
     printf(" V0=%g, gamma0=%g, x0=%g, h0=%g\n\n", V, gamma, x, h);
-
     f = fopen("voo_sim.txt", "w");
     if(!f) {
         printf("Erro ao criar voo_sim.txt!\n");
         return;
     }
-
-    /* Cabecalho no ficheiro de saida */
     fprintf(f, "# tf=%g dt=%g S=%g b=%g m=%g g=%g rho=%g cd0=%g e=%g alpha=%g\n",
-            tf, dt, S, b, m, g, rho, cd0, e, alpha);
+            tf, dt, S, b, m, g, rho, cd0, e, alpha);/* Cabecalho no ficheiro de saida */
     fprintf(f, "# t  V  gamma  x  h\n");
 
     AR = (b*b)/S; /*Faltava definir*/            
     CL = calcular_CL(alpha, AR);
     CD = calcular_CD(CL, cd0, e, AR);
-
-    t = 0.0;
-    /* Escreve estado inicial */
-    fprintf(f, "%.6f %.6f %.6f %.6f %.6f\n", t, V, gamma, x, h);
-
+    t = 0.0;/*e necessario estabelecer o referencial do tempo*/
+    fprintf(f, "%.6f %.6f %.6f %.6f %.6f\n", t, V, gamma, x, h);/* Imprime o estado inicial no terminal*/
     while(t < tf && h > 0.0) {
         lift = calcular_Lift(CL, rho, V, S);
-        drag = calcular_Drag(CD, rho, V, S);
-        /*Formulas retiradas do ponto 2-3*/
+        drag = calcular_Drag(CD, rho, V, S); /*Formulas retiradas do p.2-3*/
         dV     = (1.0/m)*(-drag - m*g*sin(gamma));
         dGamma = (1.0/(m*V))*(lift - m*g*cos(gamma));
         dx     = V*cos(gamma);
         dh     = V*sin(gamma);
-        /*retirado do ponto 4 (metodo de Euler para aproximar) rever adaptive step size control */
+        /*variaveis de estado valores p.4*/
         V     += dV * dt;
         gamma += dGamma * dt;
         x     += dx * dt;
         h     += dh * dt;
-
+         /*Formulas e metodo retirados do p.4*/
         t     += dt;
-
         fprintf(f, "%.6f %.6f %.6f %.6f %.6f\n", t, V, gamma, x, h);
     }
-
     fclose(f);
     printf("Simulacao concluida. Resultados guardados em voo_sim.txt\n");
 }
 
-/* --------------------------------------------------------------------
-   calcular_min_max()
-   ---------------------------------------------------------------------*/
 void calcular_min_max() {
     FILE *f;
     double t, V, gamma, x, h;
@@ -263,18 +202,18 @@ void calcular_min_max() {
     primeiro = 1;
     while(fgets(linha, sizeof(linha), f)) {
         if(linha[0] == '#') {
-            continue;
+            continue;/*ignorar linhas no ficheiro voo_sim.txt que nao sejam dados (as que comecam por cardinal)*/
         }
         if(sscanf(linha, "%lf %lf %lf %lf %lf", &t, &V, &gamma, &x, &h) == 5) {
             if(primeiro) {
-                t_min = t_max = t;
+                t_min = t_max = t; 
                 V_min = V_max = V;
                 g_min = g_max = gamma;
                 x_min = x_max = x;
                 h_min = h_max = h;
                 primeiro = 0;
             } else {
-                if(t < t_min) t_min = t;
+                if(t < t_min) t_min = t; 
                 if(t > t_max) t_max = t;
                 if(V < V_min) V_min = V;
                 if(V > V_max) V_max = V;
