@@ -1,5 +1,5 @@
-Duarte Pardal 113733
-Manuel Amado  114864
+/*Duarte Pardal 113733
+Manuel Amado  114864*/
 
 /***************INICIO: conteudo original de calculos.c ***************/
 
