@@ -28,24 +28,26 @@ double calcular_Drag(double CD, double rho, double V, double S) {
 /***************INICIO: conteudo original de ler_ficheiro.c (Duarte)/(Manuel)***************/
 
 /* Funcao para ler as variaveis*/
+
 int ler_variaveis(double *tf, double *dt, double *S, double *b, double *m,
                   double *g, double *ro, double *cd0, double *e, double *alpha,
                   double *v0, double *gamma0, double *x0, double *h0) {
-    FILE *arquivo = fopen("config_modelo.txt", "r");
+    FILE *arquivo;
+    char linha[100], *p;
+    int parametros_lidos = 0;
+
+    arquivo = fopen("config_modelo.txt", "r");
     if (!arquivo) {
         printf("Erro: Arquivo nao encontrado!\n");
         return 0;
     }
 
-    char linha[100];
-    char *p = linha;
-    int parametros_lidos = 0;
-
     while (fgets(linha, sizeof(linha), arquivo)) {
-        while (*p == ' ' || *p == '\t') p++; /* Ignorar linhas vazias ou que comecem com '%'*/
+        p = linha;
+        while (*p == ' ' || *p == '\t') p++;
         if (*p == '%' || *p == '\n' || *p == '\r' || *p == '\0') continue;
 
-        switch (parametros_lidos) {
+        switch (parametros_lidos++) {
             case 0:  sscanf(linha, "%lf", tf); break;
             case 1:  sscanf(linha, "%lf", dt); break;
             case 2:  sscanf(linha, "%lf", S); break;
@@ -60,11 +62,8 @@ int ler_variaveis(double *tf, double *dt, double *S, double *b, double *m,
             case 11: sscanf(linha, "%lf", gamma0); break;
             case 12: sscanf(linha, "%lf", x0); break;
             case 13: sscanf(linha, "%lf", h0); break;
-            default: break;
         }
-        parametros_lidos++;
     }
-
     fclose(arquivo);
     return (parametros_lidos == 14);
 }
@@ -143,7 +142,7 @@ void simular_movimento() {
     CL = calcular_CL(alpha, AR);
     CD = calcular_CD(CL, cd0, e, AR);
     t = 0.0;/*e necessario estabelecer o referencial do tempo*/
-    fprintf(f, "%.6f %.6f %.6f %.6f %.6f\n", t, V, gamma, x, h);/* Imprime o estado inicial no terminal*/
+    fprintf(f, "%.6f %.6f %.6f %.6f %.6f\n", t, V, gamma, x, h);
     while(t < tf && h > 0.0) {
         lift = calcular_Lift(CL, rho, V, S);
         drag = calcular_Drag(CD, rho, V, S); /*Formulas retiradas do p.2-3*/
