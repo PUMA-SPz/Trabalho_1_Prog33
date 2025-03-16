@@ -1,4 +1,7 @@
-/***************INICIO: conteudo original de calculos.c (Duarte)***************/
+Duarte Pardal 113733
+Manuel Amado  114864
+
+/***************INICIO: conteudo original de calculos.c ***************/
 
 #include <stdio.h>
 #include <math.h>
@@ -25,7 +28,7 @@ double calcular_Drag(double CD, double rho, double V, double S) {
 }
 /***************FIM: conteudo original de calculos.c ***************/
 
-/***************INICIO: conteudo original de ler_ficheiro.c (Duarte)/(Manuel)***************/
+/***************INICIO: conteudo original de ler_ficheiro.c***************/
 
 /* Funcao para ler as variaveis*/
 
