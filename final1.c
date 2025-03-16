@@ -38,12 +38,11 @@ int ler_variaveis(double *tf, double *dt, double *S, double *b, double *m,
     }
 
     char linha[100];
+    char *p = linha;
     int parametros_lidos = 0;
 
     while (fgets(linha, sizeof(linha), arquivo)) {
-        // Ignorar linhas vazias ou que comecem com '%'
-        char *p = linha;
-        while (*p == ' ' || *p == '\t') p++; // Pular espaços iniciais
+        while (*p == ' ' || *p == '\t') p++; /* Ignorar linhas vazias ou que comecem com '%'*/
         if (*p == '%' || *p == '\n' || *p == '\r' || *p == '\0') continue;
 
         switch (parametros_lidos) {
