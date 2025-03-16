@@ -1,1 +1,1 @@
-Para visualizar o grafico criamos um script chamado de plot_voo basta executa-lo no GNU octave que gera o pdf.
+Para visualizar o gráfico criámos um script chamado de plot_voo basta executá-lo no GNU octave que gera o pdf.
